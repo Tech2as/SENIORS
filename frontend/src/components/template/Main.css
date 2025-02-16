@@ -1,0 +1,391 @@
+main {
+    height: 100%;
+    width: 100%;
+}
+main > div {
+    background-color: #FFF;
+    box-shadow: 0px 0px 15px #0004;
+    height: 100%;
+    width: 100%;
+}
+.search-cliente {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.search-form {
+    display: flex;
+}
+
+.search-input {
+    width: 420px;
+    padding: 10px;
+    font-size: 15px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-right: none; /* Remove a borda direita */
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.search-button {
+    padding: 10px 20px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-left: none; /* Remove a borda esquerda */
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    background-color: #28a745;
+    color: #fff;
+    cursor: pointer;
+}
+
+.search-button:hover {
+    background-color: #218838;
+}
+
+.td-actions button {
+   margin-left: 8px;
+}
+/* DASHBOARD */
+.dashboard-main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+   
+    height: 100%; /* Faz o grid ocupar 100% da altura do contêiner pai */
+    width: 100%;
+}
+.dashboard-main div {
+    width: 100%;
+    height: 100%;
+}
+.dashboard-start {
+    grid-column: 1;
+    grid-row: 1;
+}
+.dashboard-start-second {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.dashboard-start-third {
+    grid-column: 1 / span 2; /* Ocupa duas colunas */
+    grid-row: 2;
+}
+
+.dashboard-start div {
+    background-color: #5111C9;
+}
+
+.dashboard-start-second div {
+    background-color: #308758;
+}
+
+.dashboard-start-third div {
+    background-color: #097C73;
+}
+.dashboard-data, .dashboard-data-second, .dashboard-data-third {
+    display: flex;
+    background-color: #f8f9fa;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-data p, .dashboard-data-second p{
+    font-weight: bold;
+    color: #FFF;
+    font-size: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 20%;
+}
+.dashboard-data-third p{
+    font-weight: bold;
+    color: #FFF;
+    font-size: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 20%;
+}
+.dashboard-data i{
+    padding-top: 12%;
+    padding-left: 6%;
+    border-radius: 7px;
+    height: 100%;
+    width: 20%;
+    font-size: 120px;
+    color: green;
+    box-shadow: 2px 0 10px 0 rgba(0, 0, 0, 0.12),
+    2px 0 10px 0 rgba(0, 0, 0, 0.9);
+}
+.dashboard-data-second i{
+    padding-top: 12%;
+    padding-left: 3%;
+    height: 100%;
+    width: 20%;
+    border-radius: 7px;
+    font-size: 120px;
+    background-color: #048A42;
+    color: black;
+    box-shadow: 2px 0 10px 0 rgba(0, 0, 0, 0.12),
+    2px 0 10px 0 rgba(0, 0, 0, 0.9);
+}
+.dashboard-data-third i {
+    padding-top: 10%;
+    padding-left: 4%;
+    height: 100%;
+    width: 20%;
+    border-radius: 7px;
+    font-size: 160px;
+    background-color: #20756E;
+    color: #0DFF32;
+    box-shadow: 2px 0 10px 0 rgba(0, 0, 0, 0.12),
+    2px 0 10px 0 rgba(0, 0, 0, 0.9);
+}
+
+
+
+/* Clientes */
+.container-new {
+    width: 100%; /* Ajuste conforme necessário */
+    display: flex;
+    justify-content: center; /* Centra o conteúdo horizontalmente */
+    margin-top: 5%;
+    height: 55vh; /* Faz com que o contêiner ocupe toda a altura da janela */
+}
+
+.content-new {
+    width: 100%; /* Ajuste conforme necessário */
+    max-width: 500px; /* Limite máximo de largura */
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+.form-profile {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-profile h2 {
+    text-align: center;
+}
+
+.form-profile label {
+    margin-top: 10px;
+}
+
+.form-profile input {
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-profile button {
+    margin-top: 10px;
+    padding: 10px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10%;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* Texto introdutório */
+.intro-text {
+    margin-bottom: 20px;
+    line-height: 1.8;
+    font-size: 1.1rem;
+    color: #555;
+    text-align: justify;
+}
+
+.dashboard-news {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 100%; /* Adapta-se ao tamanho da tela */
+}
+.dash-new {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinhamento de texto à esquerda */
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+/* Seção introdutória */
+.intro-section p {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    text-align: justify;
+    color: #555;
+}
+
+/* Seção de tópicos */
+.topics-section h2 {
+    font-size: 1.5rem;
+    color: #2e7d32;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #81c784;
+    padding-bottom: 5px;
+}
+
+.topics-section ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+.topics-section li {
+    font-size: 1rem;
+    color: #4e4e4e;
+    margin: 8px 0;
+}
+
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .dashboard-main {
+        padding: 15px;
+    }
+
+    .intro-text, .topics h2, .topics li {
+        font-size: 0.9rem;
+    }
+}
+
+@media(max-width: 768px) {
+    .main {
+        height: 100%;
+        width: 100%;
+    }
+
+    main > div {
+        background-color: #FFF;
+        box-shadow: 0px 0px 15px #0004;
+        height: 100%;
+        width: 96.8vh;
+    }
+
+    .dashboard-main {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+       
+        height: 100%; /* Faz o grid ocupar 100% da altura do contêiner pai */
+        width: 100%;
+    }
+
+    .dashboard-main div {
+        width: 100%;
+        height: 100%;
+    }
+
+    .dashboard-start {
+        grid-column: 1;
+        grid-row: 1;
+    }
+
+    .dashboard-start-second {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .dashboard-start-third {
+        grid-column: 1 / span 2; /* Ocupa duas colunas */
+        grid-row: 2;
+    }
+
+    .dashboard-data p, .dashboard-data-second p{
+        font-weight: bold;
+        color: #FFF;
+        font-size: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-left: 5%;
+    }
+
+    .dashboard-data-third p{
+        font-weight: bold;
+        color: #FFF;
+        font-size: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-left: 2%;
+    }
+
+    .dashboard-data i{
+        padding-top: 12%;
+        padding-left: 0.2%;
+        border-radius: 7px;
+        height: 100%;
+        width: 20%;
+        font-size: 120px;
+        color: green;
+        box-shadow: 2px 0 10px 0 rgba(0, 0, 0, 0.12),
+        2px 0 10px 0 rgba(0, 0, 0, 0.9);
+    }
+
+    .dashboard-data-second i{
+        padding-top: 12%;
+        padding-left: 0.2%;
+        height: 100%;
+        width: 25%;
+        border-radius: 7px;
+        font-size: 80px;
+        background-color: #048A42;
+        color: black;
+        box-shadow: 2px 0 10px 0 rgba(0, 0, 0, 0.12),
+        2px 0 10px 0 rgba(0, 0, 0, 0.9);
+    }
+
+    .dashboard-data-third i {
+        padding-top: 10%;
+        padding-left: 4%;
+        height: 100%;
+        width: 35%;
+        border-radius: 7px;
+        font-size: 160px;
+        background-color: #20756E;
+        color: #0DFF32;
+        box-shadow: 2px 0 10px 0 rgba(0, 0, 0, 0.12),
+        2px 0 10px 0 rgba(0, 0, 0, 0.9);
+    }
+
+    .flex-trick {
+     width: 100%;
+    }
+    .search-form {
+        width: 80%;
+    }
+    .search-cliente {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+}

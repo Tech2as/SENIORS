@@ -1,0 +1,58 @@
+aside.menu-area {
+    background-color: #2a293a;
+    box-shadow: var(--shadow-menu);
+}
+
+.menu a {
+    display: block;
+    text-decoration: none;
+    color: #FFF;
+    font-weight: 300;
+    padding: 15px;
+}
+
+.menu a:hover {
+    background: linear-gradient(135deg, #07a7e3 0%, #32dac3 100%) ;
+}
+
+.menu button {
+    text-decoration: none;
+    background-color: red;
+    color: #FFF;
+    margin-left: 50px;
+    margin-top: 2%;
+}
+
+.menu button:hover {
+    color: #FFF;
+    background: linear-gradient(135deg, #CD1414 0%, #920404 100%) ;
+}
+
+@media(max-width: 768px) {
+
+    .menu {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    .menu a {
+        display: inline;
+        padding: 10px;
+        margin: 0px;
+
+    }
+
+    .menu {
+        height: 100%;
+        justify-content: space-around;
+    }
+
+    .menu button {
+        text-decoration: none;
+        background-color: red;
+        color: #FFF;
+        margin-left: 10px;
+        margin-bottom: 2%;
+    }
+}
