@@ -8,7 +8,7 @@ import Axios from "axios";
 function Login({ onLogin }) {
 
   const handleSubmit = (values, { resetForm }) => {
-    Axios.post("http://localhost:3002/login", {
+    Axios.post(`${process.env.REACT_APP_API_URL}/login`, {
       email: values.email,
       senha: values.senha,
     }).then((response) => {

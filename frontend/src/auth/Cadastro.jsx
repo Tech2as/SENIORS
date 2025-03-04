@@ -8,7 +8,7 @@ import { ToastContainer, toast } from 'react-toastify';
 
 const Cadastro = ({ onSignup }) => {
     const handleSignupClick = (values) => {
-        Axios.post("http://localhost:3002/registro", {
+        Axios.post(`${process.env.REACT_APP_API_URL}/registro`, {
           nome: values.nome,
           funcao: values.funcao,
           email: values.email,

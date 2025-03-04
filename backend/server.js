@@ -113,7 +113,7 @@ app.post('/login', (req, res) => {
         const token = jwt.sign(
             { id: user.id, nome: user.nome, funcao: user.funcao },
             SECRET_KEY,
-            { expiresIn: "1h" } // Expiração de 24 horas
+            { expiresIn: "1h" } // Expiração de 1 hora
         );
 
         res.status(200).json({
@@ -132,9 +132,9 @@ app.post('/login', (req, res) => {
 
 // Salvar sinistro no BD
 app.post('/save-sinistro', (req, res) => {
-    const { userid, username, profissional, data, horario } = req.body;
+    const { apolice, aviso, chassi, aon, regulador, data, observacoes, status } = req.body;
     // Verificar se todos os dados obrigatórios foram enviados
-    if (!userid || !username || !profissional || !data || !horario) {
+    if (!apolice || !aviso || !chassi || !data) {
         return res.status(400).send({
             success: false,
             message: 'Todos os campos são obrigatórios.'
@@ -143,8 +143,8 @@ app.post('/save-sinistro', (req, res) => {
 
     // Inserção da consulta no banco de dados
     db.query(
-        'INSERT INTO consultas (id_paciente, nome_paciente, id_psicologo, data, hora, estado) VALUES (?, ?, ?, ?, ?, ?)',
-        [userid, username, profissional, data, horario, 'andamento'],
+        'INSERT INTO sinistros (apolice, aviso, chassi, aon, regulador, data, observacoes, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [apolice, aviso, chassi, aon, regulador, data, observacoes, status],
         (err, results) => {
             if (err) {
                 console.error("Erro no servidor durante o registro:", err);
@@ -275,80 +275,42 @@ app.get("/get-delete", (req, res) => {
     });
 });
 
-
-// Search para psicologos
-app.get('/search-atendimento', (req, res) => {
-    const { userId, page = 1, limit = 5 } = req.query;
-    console.log('userId:', userId, 'page:', page, 'limit:', limit); // Verifique os parâmetros
-    if (!userId) {
-        return res.status(400).send({ message: "userId é obrigatório" });
-    }
-
+// Search para sinistros
+app.get('/search-sinistros', (req, res) => {
+    const { page = 1, limit = 5 } = req.query;
+    
     const pageNumber = parseInt(page);
     const pageLimit = parseInt(limit);
-
     const offset = (pageNumber - 1) * pageLimit;
 
-    const sql = 'SELECT * FROM consultas WHERE id_psicologo = ? LIMIT ? OFFSET ?';
-    db.query(sql, [userId, pageLimit, offset], (err, results) => {
+    const sql = 'SELECT * FROM sinistros ORDER BY id DESC LIMIT ? OFFSET ?';
+    
+    db.query(sql, [pageLimit, offset], (err, results) => {
         if (err) {
             console.error('Erro na consulta SQL:', err);
-            return res.status(500).send({ message: 'Erro ao buscar consultas', error: err });
+            return res.status(500).send({ message: 'Erro ao buscar sinistros', error: err });
         }
-
-        const countSql = 'SELECT COUNT(*) AS count FROM consultas WHERE id_paciente = ?';
-        db.query(countSql, [userId], (countErr, countResults) => {
-            if (countErr) {
-                console.error('Erro ao contar consultas:', countErr);
-                return res.status(500).send({ message: 'Erro ao contar consultas', error: countErr });
-            }
-
-            res.json({
-                data: results,
-                total: countResults[0].count,
-                page: pageNumber,
-                limit: pageLimit
-            });
+        
+        res.json({
+            data: results,
+            total: results.length // Retorna a quantidade de registros retornados na resposta
         });
     });
 });
 
-// Search para pacientes
-app.get('/search-consultas', (req, res) => {
-    const { userId, page = 1, limit = 5 } = req.query;
-    console.log('userId:', userId, 'page:', page, 'limit:', limit); // Verifique os parâmetros
-    if (!userId) {
-        return res.status(400).send({ message: "userId é obrigatório" });
-    }
-
-    const pageNumber = parseInt(page);
-    const pageLimit = parseInt(limit);
-
-    const offset = (pageNumber - 1) * pageLimit;
-
-    const sql = 'SELECT consultas.*, usuarios.nome AS nome FROM consultas INNER JOIN usuarios ON consultas.id_psicologo = usuarios.id WHERE consultas.id_paciente = ? LIMIT ? OFFSET ?';
-    db.query(sql, [userId, pageLimit, offset], (err, results) => {
-        if (err) {
-            console.error('Erro na consulta SQL:', err);
-            return res.status(500).send({ message: 'Erro ao buscar consultas', error: err });
-        }
-
-        const countSql = 'SELECT COUNT(*) AS count FROM consultas WHERE id_paciente = ?';
-        db.query(countSql, [userId], (countErr, countResults) => {
-            if (countErr) {
-                console.error('Erro ao contar consultas:', countErr);
-                return res.status(500).send({ message: 'Erro ao contar consultas', error: countErr });
-            }
-
-            res.json({
-                data: results,
-                total: countResults[0].count,
-                page: pageNumber,
-                limit: pageLimit
-            });
-        });
-    });
-});
+//Ver sinistros pelo id
+app.get("/get-sinistro", (req, res) => {
+    const id = req.query.id;
+ 
+    const sql = 'SELECT * FROM sinistros WHERE id = ?';
+    db.query(sql, [id], (err, results) => {
+         if (err) {
+             console.error('Erro na consulta SQL:', err); // Log para erro na consulta
+             return res.status(500).send(err);
+         }
+         res.json(results);
+     });
+ });
 
 app.get('/search-name-user', (req, res) => {
     const token = req.headers['x-access-token'];
@@ -418,6 +380,7 @@ app.get('/me', (req, res) => {
     });
 });
 
-app.listen(3002, () =>{
-    console.log("3002")
-}) 
+const PORT = process.env.PORT
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor rodando na porta ${PORT}`);
+});
