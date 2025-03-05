@@ -49,17 +49,25 @@ const App = () => {
   };
 
   return (
-    <div className="app">
-      <Logo />
-      <Nav onLogout={handleLogout} userRole={userRole} />
+<div className={`app ${!isAuthenticated ? "login-layout" : ""}`}>
+
+{isAuthenticated && (
+        <>
+          <Logo />
+          <Nav onLogout={handleLogout} userRole={userRole} />
+        </>
+      )}
+      
       <Routes>
         {!isAuthenticated ? (
           <>
             <Route path="/" element={<Login onLogin={handleLogin} />} />
             <Route path="/cadastro" element={<Cadastro onSignup={handleSignup} />} />
+            <Route path="*" element={<Navigate to="/home" />} />
           </>
         ) : (
           <>
+          
             <Route path="/home" element={<Home />} />
             <Route path="/sinistros" element={<PrivateRoute element={Sinistros} />} />
             <Route path="/consultas" element={<PrivateRoute element={Consultas} />} />
@@ -68,9 +76,11 @@ const App = () => {
           </>
         )}
       </Routes>
-      <Footer />
+  
+      {isAuthenticated && <Footer />}
     </div>
   );
+  
 };
 
 export default App;

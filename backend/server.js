@@ -161,6 +161,47 @@ app.post('/save-sinistro', (req, res) => {
         }
     );
 });
+
+//edit sinistro
+app.post('/edit-sinistro', (req, res) => {
+    const { id, apolice, aviso, chassi, aon, data, observacoes, status } = req.body;
+
+    // Verificar se todos os dados obrigatórios foram enviados
+    if (!id || !apolice || !aviso || !chassi || !data) {
+        return res.status(400).send({
+            success: false,
+            message: 'Todos os campos obrigatórios devem ser preenchidos.'
+        });
+    }
+
+    // Atualizar os dados no banco de dados
+    db.query(
+        'UPDATE sinistros SET apolice=?, aviso=?, chassi=?, aon=?, data=?, observacoes=?, estado=? WHERE id=?',
+        [apolice, aviso, chassi, aon, data, observacoes, status, id],
+        (err, results) => {
+            if (err) {
+                console.error("Erro no servidor durante a atualização:", err);
+                return res.status(500).send({
+                    success: false,
+                    message: 'Erro no servidor ao atualizar o sinistro.'
+                });
+            }
+
+            // Verificar se alguma linha foi afetada
+            if (results.affectedRows === 0) {
+                return res.status(404).send({
+                    success: false,
+                    message: 'Sinistro não encontrado.'
+                });
+            }
+
+            res.status(200).send({
+                success: true,
+                message: 'Sinistro atualizado com sucesso!'
+            });
+        }
+    );
+});
 // search conta
 app.get('/search-conta', (req, res) => {
     const { userId } = req.query;

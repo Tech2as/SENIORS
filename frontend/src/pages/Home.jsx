@@ -6,9 +6,6 @@ const Home = () => {
 <Main icon="home" title="Início">
 <div className="dashboard-news">
                 <div className="dash-new intro-section">
-                    <p>
-                        Sinistros.
-                    </p>
                 </div>
                 <div className="dash-new topics-section">
                     <h2>Temas :</h2>
