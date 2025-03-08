@@ -112,23 +112,37 @@ const fetchSinistros = async () => {
     }
 };
 
-const handleSubmit = (values) => {
+//salvar os dados do novo sinistro
+const handleSubmit = (values, { setSubmitting }) => {
     Axios.post(`${process.env.REACT_APP_API_URL}/save-sinistro`, {
-      apolice: values.apolice,
-      status: values.status,
-      aviso: values.aviso,
-      chassi: values.chassi,
-      aon: values.aon,
-      regulador: values.regulador,
-      data: values.data,
-      observacoes: values.observacoes
-    }).then((response) => {
-        toast.success("Sinistro registrado!");
-        window.location.reload(); // Força o recarregamento da página
-    }).catch((error) => {
-      console.error("Houve um erro", error);
+        apolice: values.apolice,
+        status: values.status,
+        aviso: values.aviso,
+        chassi: values.chassi,
+        aon: values.aon,
+        regulador: values.regulador,
+        data: values.data,
+        observacoes: values.observacoes
+    })
+    .then(() => {
+        toast.success("Sinistro registrado com sucesso!");
+        handleCloseModal();
+    })
+    .catch((error) => {
+        if (error.response) {
+            if (error.response.status === 409) {
+                toast.error("Já existe um sinistro cadastrado com este número de aviso ou chassi!");
+            } else {
+                toast.error("Erro ao registrar o sinistro. Tente novamente.");
+            }
+        } else {
+            console.error("Erro inesperado:", error);
+        }
+    })
+    .finally(() => {
+        setSubmitting(false);
     });
-  };
+};
 
 //pegar o ID do sinistro
 const handleClick = (event) => {
@@ -177,7 +191,7 @@ const handleClickEdit = (event) => {
     };
 
 //salvar os dados do editar
-const handleSave = (values) => {
+const handleSave = (values, { setSubmitting }) => {
     Axios.post(`${process.env.REACT_APP_API_URL}/edit-sinistro`, {
       id: values.idsinistro,
       apolice: values.apolice,
@@ -187,11 +201,22 @@ const handleSave = (values) => {
       aon: values.aon,
       data: values.data,
       observacoes: values.observacoes
-    }).then((response) => {
+    }).then(() => {
         toast.success("Sinistro editado!");
         window.location.reload(); // Força o recarregamento da página
     }).catch((error) => {
-      console.error("Houve um erro", error);
+        if (error.response) {
+            if (error.response.status === 409) {
+                toast.error("Já existe um sinistro cadastrado com este número de aviso ou chassi!");
+            } else {
+                toast.error("Erro ao editar o sinistro. Tente novamente.");
+            }
+        } else {
+            console.error("Erro inesperado:", error);
+        }
+    })
+    .finally(() => {
+        setSubmitting(false);
     });
   };
 
@@ -285,6 +310,7 @@ const handleSave = (values) => {
                         <Form action="">
                             <h2>Novo Sinistro</h2>
                             <div className="modal-inside">
+
                                 <div className="form-group1">
                                     <label>Apólice:</label>
                                     <Field as="select" name="apolice">

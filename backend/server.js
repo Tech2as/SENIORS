@@ -133,34 +133,56 @@ app.post('/login', (req, res) => {
 // Salvar sinistro no BD
 app.post('/save-sinistro', (req, res) => {
     const { apolice, aviso, chassi, aon, regulador, data, observacoes, status } = req.body;
-    // Verificar se todos os dados obrigatórios foram enviados
+
     if (!apolice || !aviso || !chassi || !data) {
         return res.status(400).send({
             success: false,
-            message: 'Todos os campos são obrigatórios.'
+            message: 'Todos os campos obrigatórios devem ser preenchidos.'
         });
     }
 
-    // Inserção da consulta no banco de dados
+    // Verifica se já existe um sinistro com o mesmo aviso OU chassi
     db.query(
-        'INSERT INTO sinistros (apolice, aviso, chassi, aon, regulador, data, observacoes, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [apolice, aviso, chassi, aon, regulador, data, observacoes, status],
+        'SELECT * FROM sinistros WHERE aviso = ? OR chassi = ?',
+        [aviso, chassi],
         (err, results) => {
             if (err) {
-                console.error("Erro no servidor durante o registro:", err);
+                console.error("Erro no servidor:", err);
                 return res.status(500).send({
                     success: false,
-                    message: 'Erro no servidor ao registrar a consulta.'
+                    message: 'Erro no servidor ao verificar o sinistro.'
                 });
             }
-            // Se a inserção for bem-sucedida
-            res.status(201).send({
-                success: true,
-                message: 'Consulta registrada com sucesso!'
-            });
+
+            if (results.length > 0) {
+                return res.status(409).send({
+                    success: false,
+                    message: 'Já existe um sinistro cadastrado com este número de aviso ou chassi.'
+                });
+            }
+
+            // Se não existir, insere o novo sinistro
+            db.query(
+                'INSERT INTO sinistros (apolice, aviso, chassi, aon, regulador, data, observacoes, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+                [apolice, aviso, chassi, aon, regulador, data, observacoes, status],
+                (err, results) => {
+                    if (err) {
+                        console.error("Erro ao registrar sinistro:", err);
+                        return res.status(500).send({
+                            success: false,
+                            message: 'Erro ao registrar o sinistro.'
+                        });
+                    }
+                    res.status(201).send({
+                        success: true,
+                        message: 'Sinistro registrado com sucesso!'
+                    });
+                }
+            );
         }
     );
 });
+
 
 //edit sinistro
 app.post('/edit-sinistro', (req, res) => {
@@ -173,6 +195,27 @@ app.post('/edit-sinistro', (req, res) => {
             message: 'Todos os campos obrigatórios devem ser preenchidos.'
         });
     }
+
+    // Verifica se já existe um sinistro com o mesmo aviso OU chassi
+    db.query(
+        'SELECT * FROM sinistros WHERE aviso = ? OR chassi = ?',
+        [aviso, chassi],
+        (err, results) => {
+            if (err) {
+                console.error("Erro no servidor:", err);
+                return res.status(500).send({
+                    success: false,
+                    message: 'Erro no servidor ao verificar o sinistro.'
+                });
+            }
+
+            if (results.length > 0) {
+                return res.status(409).send({
+                    success: false,
+                    message: 'Já existe um sinistro cadastrado com este número de aviso ou chassi.'
+                });
+            }
+
 
     // Atualizar os dados no banco de dados
     db.query(
@@ -201,6 +244,8 @@ app.post('/edit-sinistro', (req, res) => {
             });
         }
     );
+}
+);
 });
 // search conta
 app.get('/search-conta', (req, res) => {
