@@ -190,7 +190,7 @@ const handleClickEdit = (event) => {
     };
 
 //salvar os dados do editar
-const handleSave = (values, { setSubmitting }) => {
+const handleSave = (values) => {
     Axios.post(`${process.env.REACT_APP_API_URL}/edit-sinistro`, {
       id: values.idsinistro,
       apolice: values.apolice,
@@ -215,17 +215,16 @@ const handleSave = (values, { setSubmitting }) => {
   };
 
 // filtro
-const [filtroTipo, setFiltroTipo] = useState("apolice"); // Pode ser "apolice" ou "status"
+const [filtroTipo, setFiltroTipo] = useState("apolice"); // Pode ser "apolice", "status" ou "texto"
 const [filtroValor, setFiltroValor] = useState(""); // Valor do filtro selecionado
-const [sinistrosFiltrados, setSinistrosFiltrados] = useState([]); // Estado para armazenar os filtrados
+const [sinistrosFiltrados, setSinistrosFiltrados] = useState([]);
 
 const apolices = ["PSA", "IVECO", "CNH"];
 const statusList = ["Aberto", "Pendente", "Encerrado"];
 
-// Sempre que `sinistros`, `filtroTipo` ou `filtroValor` mudarem, refazemos o filtro
 useEffect(() => {
   if (!filtroValor) {
-    setSinistrosFiltrados(sinistros); // Se não houver filtro, mostrar todos
+    setSinistrosFiltrados(sinistros);
     return;
   }
 
@@ -236,17 +235,25 @@ useEffect(() => {
     if (filtroTipo === "status") {
       return sinistro.estado.trim().toLowerCase() === filtroValor.toLowerCase();
     }
+    if (filtroTipo === "texto") {
+      return (
+        sinistro.aviso.includes(filtroValor) ||
+        sinistro.chassi.includes(filtroValor) ||
+        sinistro.aon.includes(filtroValor)
+      );
+    }
     return true;
   });
 
   setSinistrosFiltrados(filtrados);
 }, [sinistros, filtroTipo, filtroValor]);
 
+
     return (
         <Main icon="car" title="Sinistros" >
             <div className="p-3">
             <ToastContainer /> 
-            <div className="d-flex justify-content-between">
+            <div className="d-flex justify-content-between pb-3">
                 <button className="btn btn-success" onClick={handleOpenModal}>
                     <i className="fa fa-plus-square px-2"></i>
                    Novo Sinistro
@@ -255,29 +262,39 @@ useEffect(() => {
             </div>
 
             <div className="d-flex mb-3">
-      <select
+            <select
         className="form-control me-2"
         value={filtroTipo}
         onChange={(e) => {
           setFiltroTipo(e.target.value);
-          setFiltroValor(""); // Resetar filtro ao mudar o tipo
+          setFiltroValor("");
         }}
       >
         <option value="apolice">Apólice</option>
         <option value="status">Status</option>
+        <option value="texto">Número de Aviso, Chassi ou AON</option>
       </select>
 
-      <select
-        className="form-control"
-        value={filtroValor}
-        onChange={(e) => setFiltroValor(e.target.value)}
-      >
-        <option value="">Todos</option>
-        {filtroTipo === "apolice"
-          ? apolices.map((ap) => <option key={ap} value={ap}>{ap}</option>)
-          : statusList.map((st) => <option key={st} value={st}>{st}</option>)
-        }
-      </select>
+      {filtroTipo === "texto" ? (
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Digite para buscar"
+          value={filtroValor}
+          onChange={(e) => setFiltroValor(e.target.value)}
+        />
+      ) : (
+        <select
+          className="form-control"
+          value={filtroValor}
+          onChange={(e) => setFiltroValor(e.target.value)}
+        >
+          <option value="">Todos</option>
+          {filtroTipo === "apolice"
+            ? apolices.map((ap) => <option key={ap} value={ap}>{ap}</option>)
+            : statusList.map((st) => <option key={st} value={st}>{st}</option>)}
+        </select>
+      )}
     </div>
     <table className="table table-bordered mt-4">
       <thead>
