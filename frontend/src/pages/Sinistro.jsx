@@ -20,7 +20,6 @@ const Sinistros = () => {
      const [limit] = useState(5);
      const [total, setTotal] = useState(0);
      
-
     // Modal do abrir sinistro
     const [showModal, setShowModal] = useState(false);
     const handleOpenModal = () => setShowModal(true);
@@ -206,19 +205,42 @@ const handleSave = (values, { setSubmitting }) => {
         window.location.reload(); // Força o recarregamento da página
     }).catch((error) => {
         if (error.response) {
-            if (error.response.status === 409) {
-                toast.error("Já existe um sinistro cadastrado com este número de aviso ou chassi!");
-            } else {
+             {
                 toast.error("Erro ao editar o sinistro. Tente novamente.");
             }
         } else {
             console.error("Erro inesperado:", error);
         }
     })
-    .finally(() => {
-        setSubmitting(false);
-    });
   };
+
+// filtro
+const [filtroTipo, setFiltroTipo] = useState("apolice"); // Pode ser "apolice" ou "status"
+const [filtroValor, setFiltroValor] = useState(""); // Valor do filtro selecionado
+const [sinistrosFiltrados, setSinistrosFiltrados] = useState([]); // Estado para armazenar os filtrados
+
+const apolices = ["PSA", "IVECO", "CNH"];
+const statusList = ["Aberto", "Pendente", "Encerrado"];
+
+// Sempre que `sinistros`, `filtroTipo` ou `filtroValor` mudarem, refazemos o filtro
+useEffect(() => {
+  if (!filtroValor) {
+    setSinistrosFiltrados(sinistros); // Se não houver filtro, mostrar todos
+    return;
+  }
+
+  const filtrados = sinistros.filter((sinistro) => {
+    if (filtroTipo === "apolice") {
+      return sinistro.apolice.trim().toUpperCase() === filtroValor.toUpperCase();
+    }
+    if (filtroTipo === "status") {
+      return sinistro.estado.trim().toLowerCase() === filtroValor.toLowerCase();
+    }
+    return true;
+  });
+
+  setSinistrosFiltrados(filtrados);
+}, [sinistros, filtroTipo, filtroValor]);
 
     return (
         <Main icon="car" title="Sinistros" >
@@ -232,73 +254,115 @@ const handleSave = (values, { setSubmitting }) => {
 
             </div>
 
-            <table className="table table-bordered mt-4" >
-                <thead>
-                    <tr>
-                        <th>Número de Aviso</th>
-                        <th>Chassi</th>
-                        <th>Apólice</th>
-                        <th>AON</th>
-                        <th>Regulador</th>
-                        <th>Data</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {sinistros.map((sinistro, index) => {
-  const estado = estadoMap[sinistro.estado.toLowerCase()] || { label: sinistro.estado, color: 'transparent' };
-  return (
-    <tr key={index}>
-      <td>{sinistro.aviso}</td>
-      <td>{sinistro.chassi}</td>
-      <td>{sinistro.apolice}</td>
-      <td>{sinistro.aon}</td>
-      <td>{sinistro.regulador}</td>
-      <td>{new Date(sinistro.data).toLocaleDateString('pt-BR')}</td>
-      <td>
-        <span
-          style={{
-            display: 'inline-block',
-            padding: '5px 10px',
-            borderRadius: '5px',
-            backgroundColor: estado.color,
-            color: 'white',
-          }}
-        >
-          {estado.label}
-        </span>
-      </td>
-      <td className="td-actions">
-        <button
-          className="btn btn-primary"
-          value={sinistro.id}
-          onClick={handleClick}
-        >
-          <i className="fa fa-eye"></i>
-        </button>
-        <button
-          className="btn btn-warning"
-          value={sinistro.id}
-          onClick={handleClickEdit}
-        >
-          <i className="fa fa-pencil-square-o"></i>
-        </button>
-      </td>
-    </tr>
-  );
-})}
+            <div className="d-flex mb-3">
+      <select
+        className="form-control me-2"
+        value={filtroTipo}
+        onChange={(e) => {
+          setFiltroTipo(e.target.value);
+          setFiltroValor(""); // Resetar filtro ao mudar o tipo
+        }}
+      >
+        <option value="apolice">Apólice</option>
+        <option value="status">Status</option>
+      </select>
 
-                </tbody>
-            </table>
+      <select
+        className="form-control"
+        value={filtroValor}
+        onChange={(e) => setFiltroValor(e.target.value)}
+      >
+        <option value="">Todos</option>
+        {filtroTipo === "apolice"
+          ? apolices.map((ap) => <option key={ap} value={ap}>{ap}</option>)
+          : statusList.map((st) => <option key={st} value={st}>{st}</option>)
+        }
+      </select>
+    </div>
+    <table className="table table-bordered mt-4">
+      <thead>
+        <tr>
+          <th>Número de Aviso</th>
+          <th>Chassi</th>
+          <th>Apólice</th>
+          <th>AON</th>
+          <th>Regulador</th>
+          <th>Data</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sinistrosFiltrados.length > 0 ? (
+          sinistrosFiltrados.map((sinistro, index) => {
+            const estado =
+              estadoMap[sinistro.estado.toLowerCase()] || {
+                label: sinistro.estado,
+                color: "transparent",
+              };
+            return (
+              <tr key={index}>
+                <td>{sinistro.aviso}</td>
+                <td>{sinistro.chassi}</td>
+                <td>{sinistro.apolice}</td>
+                <td>{sinistro.aon}</td>
+                <td>{sinistro.regulador}</td>
+                <td>{new Date(sinistro.data).toLocaleDateString("pt-BR")}</td>
+                <td>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      padding: "5px 10px",
+                      borderRadius: "5px",
+                      backgroundColor: estado.color,
+                      color: "white",
+                    }}
+                  >
+                    {estado.label}
+                  </span>
+                </td>
+                <td className="td-actions">
+                  <button
+                    className="btn btn-primary"
+                    value={sinistro.id}
+                    onClick={handleClick}
+                  >
+                    <i className="fa fa-eye"></i>
+                  </button>
+                  <button
+                    className="btn btn-warning"
+                    value={sinistro.id}
+                    onClick={handleClickEdit}
+                  >
+                    <i className="fa fa-pencil-square-o"></i>
+                  </button>
+                </td>
+              </tr>
+            );
+          })
+        ) : (
+          <tr>
+            <td colSpan="8" className="text-center">Nenhum sinistro encontrado</td>
+          </tr>
+        )}
+      </tbody>
+    </table>
             <div className="d-flex justify-content-between">
-                <button className="btn btn-danger" disabled={page === 1} onClick={() => setPage(page - 1)}>
-                    Anterior
-                </button>
-                <span>Página {page}</span>
-                <button className="btn btn-primary" disabled={total < limit} onClick={() => setPage(page + 1)}>
-                    Próximo
-                </button>
+            <button
+        className="btn btn-danger"
+        disabled={page === 1}
+        onClick={() => setPage(page - 1)}
+      >
+        Anterior
+      </button>
+      <span>Página {page}</span>
+      <button
+        className="btn btn-primary"
+        disabled={total < limit}
+        onClick={() => setPage(page + 1)}
+      >
+        Próximo
+      </button>
             </div>
 
             </div>

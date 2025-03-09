@@ -196,27 +196,6 @@ app.post('/edit-sinistro', (req, res) => {
         });
     }
 
-    // Verifica se já existe um sinistro com o mesmo aviso OU chassi
-    db.query(
-        'SELECT * FROM sinistros WHERE aviso = ? OR chassi = ?',
-        [aviso, chassi],
-        (err, results) => {
-            if (err) {
-                console.error("Erro no servidor:", err);
-                return res.status(500).send({
-                    success: false,
-                    message: 'Erro no servidor ao verificar o sinistro.'
-                });
-            }
-
-            if (results.length > 0) {
-                return res.status(409).send({
-                    success: false,
-                    message: 'Já existe um sinistro cadastrado com este número de aviso ou chassi.'
-                });
-            }
-
-
     // Atualizar os dados no banco de dados
     db.query(
         'UPDATE sinistros SET apolice=?, aviso=?, chassi=?, aon=?, data=?, observacoes=?, estado=? WHERE id=?',
@@ -244,9 +223,9 @@ app.post('/edit-sinistro', (req, res) => {
             });
         }
     );
-}
-);
 });
+
+    
 // search conta
 app.get('/search-conta', (req, res) => {
     const { userId } = req.query;
