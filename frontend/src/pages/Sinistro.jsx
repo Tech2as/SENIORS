@@ -10,6 +10,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { format, parse } from "date-fns";
 
+import VerSinistrosDetalhes from "../components/modals/VerDetalhesSinistro";
+import EditarSinistros from '../components/modals/EditarSinistros';
+
+
 const Sinistros = () => {
 
     const navigate = useNavigate();
@@ -25,10 +29,13 @@ const Sinistros = () => {
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
 
+    //Modal global
+    const [sinistroSelecionado, setSinistroSelecionado] = useState(null);
+
     //Modal do ver detalhes do sinistro
     const [showAModal, setshowAModal] = useState(false);
     const handleOpenAModal = () => setshowAModal(true);
-    const handleCloseAModal = () => setshowAModal(false)
+    const handleCloseAModal = () => setshowAModal(false);
 
     //Modal do editar sinistro
     const [showEModal, setshowEModal] = useState(false);
@@ -96,13 +103,19 @@ useEffect(() => {
 
 const fetchSinistros = async () => {
     
+    const token = localStorage.getItem('token'); 
+    if (!token) {
+        console.error('Token não disponível');
+        return;
+    }
+
     if (!userId) {
         console.error('userId não disponível');
         return; // Se o userId não estiver definido, não faça a requisição
     }
     try {
         const response = await Axios.get(`${process.env.REACT_APP_API_URL}/search-sinistros`, {
-            params: { page, limit }
+            params: { page, limit }  
         });
         setSinistros(response.data.data);
         setTotal(response.data.total); // Atualiza o total de registros retornados
@@ -147,47 +160,84 @@ const handleSubmit = (values, { setSubmitting }) => {
 const handleClick = (event) => {
     const id = event.currentTarget.value;
     
-    Axios.get(`${process.env.REACT_APP_API_URL}/get-sinistro?id=${id}`,)
+    Axios.get(`${process.env.REACT_APP_API_URL}/get-sinistro?id=${id}`)
         .then((response) => {
-            const sin = response.data[0];  
-            setIdSinistro(sin.id)
-            setAviso(sin.aviso)
-            setChassi(sin.chassi)
-            setApolice(sin.apolice)
-            setAon(sin.aon)
-            setRegulador(sin.regulador)
-            setData(sin.data)
-            setObservacoes(sin.observacoes)
-            setStatus(sin.estado)
-            handleOpenAModal()
-            })
-            .catch((error) => {
-                console.error('Erro ao fazer a solicitação GET:', error);
-            });
-    };
+            const sin = response.data[0];
+            // Armazene todos os dados do sinistro em um único objeto
+            const sinistroData = {
+                idsinistro: sin.id,
+                aviso: sin.aviso,
+                chassi: sin.chassi,
+                apolice: sin.apolice,
+                aon: sin.aon,
+                regulador: sin.regulador,
+                data: sin.data,
+                observacoes: sin.observacoes,
+                status: sin.estado
+            };
+            
+            // Defina o sinistro selecionado
+            setSinistroSelecionado(sinistroData);
+            
+            setIdSinistro(sin.id);
+            setAviso(sin.aviso);
+            setChassi(sin.chassi);
+            setApolice(sin.apolice);
+            setAon(sin.aon);
+            setRegulador(sin.regulador);
+            setData(sin.data);
+            setObservacoes(sin.observacoes);
+            setStatus(sin.estado);
+            
+            handleOpenAModal();
+        })
+        .catch((error) => {
+            console.error('Erro ao fazer a solicitação GET:', error);
+        });
+};
 
 //req ID sinistro do editar
 const handleClickEdit = (event) => {
     const id = event.currentTarget.value;
     
-    Axios.get(`${process.env.REACT_APP_API_URL}/get-sinistro?id=${id}`,)
+    Axios.get(`${process.env.REACT_APP_API_URL}/get-sinistro?id=${id}`)
         .then((response) => {
-            const sin = response.data[0];  
-            setIdSinistro(sin.id)
-            setAviso(sin.aviso)
-            setChassi(sin.chassi)
-            setApolice(sin.apolice)
-            setAon(sin.aon)
-            setRegulador(sin.regulador)
-            setData(sin.data)
-            setObservacoes(sin.observacoes)
-            setStatus(sin.estado)
-            handleOpenEModal()
-            })
-            .catch((error) => {
-                console.error('Erro ao fazer a solicitação GET:', error);
-            });
-    };
+            const sin = response.data[0];
+            
+            // Armazene todos os dados do sinistro em um único objeto
+            const sinistroData = {
+                idsinistro: sin.id,
+                aviso: sin.aviso,
+                chassi: sin.chassi,
+                apolice: sin.apolice,
+                aon: sin.aon,
+                regulador: sin.regulador,
+                data: sin.data,
+                observacoes: sin.observacoes,
+                status: sin.estado
+            };
+            
+            // Defina o sinistro selecionado
+            setSinistroSelecionado(sinistroData);
+            
+            // Continue atualizando os estados individuais se precisar
+            setIdSinistro(sin.id);
+            setAviso(sin.aviso);
+            setChassi(sin.chassi);
+            setApolice(sin.apolice);
+            setAon(sin.aon);
+            setRegulador(sin.regulador);
+            setData(sin.data);
+            setObservacoes(sin.observacoes);
+            setStatus(sin.estado);
+            
+            // Abra o modal de edição
+            handleOpenEModal();
+        })
+        .catch((error) => {
+            console.error('Erro ao fazer a solicitação GET:', error);
+        });
+};
 
 //salvar os dados do editar
 const handleSave = (values) => {
@@ -233,6 +283,7 @@ useEffect(() => {
       return sinistro.apolice.trim().toUpperCase() === filtroValor.toUpperCase();
     }
     if (filtroTipo === "status") {
+        console.log(sinistro.estado);
       return sinistro.estado.trim().toLowerCase() === filtroValor.toLowerCase();
     }
     if (filtroTipo === "texto") {
@@ -383,6 +434,12 @@ useEffect(() => {
             </div>
 
             </div>
+  {/* Modal de Detalhes do Sinistro */}
+  <VerSinistrosDetalhes
+    showAModal={showAModal}
+    handleCloseAModal={handleCloseAModal}
+    sinistro={sinistroSelecionado}
+/>
 {/* Modal do Novo Sinistro */}
 <Modal show={showModal} onClose={handleCloseModal}>
                 <div className="modal-content2">
@@ -475,178 +532,14 @@ useEffect(() => {
                 </div>
             </Modal>
 
-{/* Modal do Ver Detalhes sinistro */}
-<Modal show={showAModal} onClose={handleCloseAModal}>
-                <div className="modal-content2">
-                    <Formik initialValues={{ idsinistro: idsinistro, 
-                        aviso: aviso,
-                        chassi: chassi,
-                        apolice: apolice,
-                        aon: aon,
-                        regulador: regulador,
-                        data: new Date(data).toLocaleDateString('pt-BR'),
-                        observacoes: observacoes,
-                        status: status
-                    }}
-                        >
-                        <Form action="">
-                            <h2>Detalhes do sinistro</h2>
-                            <div className="modal-inside">
-                                <div className="form-group1">
-                                    <label>Apólice:</label>
-                                    <Field type="text" name="apolice" disabled>
-                                    </Field>
-                                </div>
-
-                                <div className="form-group1">
-                                    <label>Status do processo:</label>
-                                    <Field name="status" disabled/>
-                                </div>
-
-                                <div className="form-group1">
-                                    <label>Número de aviso:</label>
-                                    <Field name="aviso"
-                                        type="number" disabled
-                                    />
-                                </div>
-
-                                <div className="form-group1">
-                                    <label>Chassi:</label>
-                                    <Field name="chassi"
-                                        type="text" disabled
-                                    />
-                                </div>
-
-                                <div className="form-group1">
-                                    <label>AON:</label>
-                                    <Field name="aon"
-                                        type="text" disabled
-                                    />
-                                </div>
-
-                                <div className="form-group1">
-                                    <label>Regulador:</label>
-                                    <Field name="regulador"
-                                        type="text" disabled
-                                    />
-                                </div>
-
-                                <div className="form-group1">
-                                    <label>Data:</label>
-                                    <Field name="data"
-                                        type="text" disabled
-                                    />
-                                </div>
-
-                                <div className="form-group1">
-                                    <label htmlFor="observacoes">Observações:</label>
-                                    <Field
-                                        as="textarea"
-                                        id="observacoes"
-                                        name="observacoes"
-                                        className="form-control" disabled
-                                    />
-                                </div>
-                                <button onClick={handleCloseAModal} type="button" className="btn btn-primary">Ok</button>
-                            </div>
-                        </Form>
-                    </Formik>
-                </div>
-            </Modal>
-
 {/* Modal do Editar sinistro */}
-<Modal show={showEModal} onClose={handleCloseEModal}>
-                <div className="modal-content2">
-                    <Formik initialValues={{ idsinistro: idsinistro, 
-                        aviso: aviso,
-                        chassi: chassi,
-                        apolice: apolice,
-                        aon: aon,
-                        regulador: regulador,
-                        data: data ? new Date(data).toISOString().split('T')[0] : '',
-                        observacoes: observacoes,
-                        status: status}} 
-                        
-                        onSubmit={handleSave}
-                        validationSchema={validationSchema}>
-                    
-                        <Form action="">
-                            <h2>Novo Sinistro</h2>
-                            <div className="modal-inside">
-                                <div className="form-group1">
-                                    <label>Apólice:</label>
-                                    <Field as="select" name="apolice">
-                                        <option value="">Selecione uma apólice</option>
-                                        <option value="PSA">PSA</option>
-                                        <option value="IVECO">IVECO</option>
-                                        <option value="CNH">CNH</option>
-                                    </Field>
-                                <ErrorMessage component="span" className="text-danger" name="apolice" />
-                                </div>
-
-                                <div className="form-group1">
-                                    <label>Status do processo:</label>
-                                    <Field as="select" name="status">
-                                        <option value="">Selecione</option>
-                                        <option value="aberto">Processo aberto</option>
-                                        <option value="pendente">Documentos faltantes</option>
-                                        <option value="encerrado">Processo encerrado</option>
-                                    </Field>
-                                <ErrorMessage component="span" className="text-danger" name="status" />
-                                </div>
-
-                                <div className="form-group1">
-                                    <label>Número de aviso:</label>
-                                    <Field name="aviso"
-                                        type="number"
-                                    />
-                                    <ErrorMessage component="span" className="text-danger" name="aviso" />
-                                </div>
-
-                                <div className="form-group1">
-                                    <label>Chassi:</label>
-                                    <Field name="chassi"
-                                        type="text"
-                                    />
-                                    <ErrorMessage component="span" className="text-danger" name="chassi" />
-                                </div>
-
-                                <div className="form-group1">
-                                    <label>AON:</label>
-                                    <Field name="aon"
-                                        type="text"
-                                    />
-                                    <ErrorMessage component="span" className="text-danger" name="aon" />
-                                </div>
-
-                                <div className="form-group1">
-                                    <label>Data:</label>
-                                    <Field name="data"
-                                        type="date"
-                                    />
-                                    <ErrorMessage component="span" className="text-danger" name="data" />
-                                </div>
-
-                                <div className="form-group1">
-                                    <label htmlFor="observacoes">Observações:</label>
-                                    <Field
-                                        as="textarea"
-                                        id="observacoes"
-                                        name="observacoes"
-                                        className="form-control"
-                                    />
-                                    <ErrorMessage component="span" className="text-danger" name="observacoes" />
-                                </div>
-
-                                <Field name="idsinistro"  hidden />
-                                <Field name="username"  hidden />
-
-                                <button type="submit" className="btn btn-success">Salvar</button>
-                            </div>
-                        </Form>
-                    </Formik>
-                </div>
-            </Modal>
+<EditarSinistros
+  showEModal={showEModal}
+  handleCloseEModal={handleCloseEModal}
+  sinistro={sinistroSelecionado}
+  handleSave={handleSave}
+  validationSchema={validationSchema}
+/>
         </Main>
     );
 };

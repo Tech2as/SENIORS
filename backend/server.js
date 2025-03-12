@@ -342,6 +342,7 @@ app.get("/get-delete", (req, res) => {
 
 // Search para sinistros
 app.get('/search-sinistros', (req, res) => {
+    
     const { page = 1, limit = 5 } = req.query;
     
     const pageNumber = parseInt(page);
