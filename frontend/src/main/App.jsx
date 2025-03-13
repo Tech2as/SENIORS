@@ -8,7 +8,6 @@ import Footer from "../components/template/Footer";
 import Logo from "../components/template/Logo";
 import Nav from "../components/template/Nav";
 import Sinistros from "../pages/Sinistro";
-import Consultas from "../pages/Consultas";
 import Login from "../auth/Login";
 import Cadastro from "../auth/Cadastro";
 import PrivateRoute from "../auth/Private";
@@ -70,7 +69,6 @@ const App = () => {
           
             <Route path="/home" element={<Home />} />
             <Route path="/sinistros" element={<PrivateRoute element={Sinistros} />} />
-            <Route path="/consultas" element={<PrivateRoute element={Consultas} />} />
             <Route path="/conta" element={<PrivateRoute element={Conta} />} />
             <Route path="*" element={<Navigate to="/home" />} />
           </>

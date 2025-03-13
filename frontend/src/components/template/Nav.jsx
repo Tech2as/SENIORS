@@ -16,11 +16,6 @@ const Nav = ({onLogout, userRole }) => {
                         <i className="fa fa-car"></i> Sinistros
                     </Link>
                 )}
-                 {userRole === "psicologo" && (
-                    <Link to="/consultas">
-                        <i className="fa fa-users"></i> Consultas
-                    </Link>
-                )}
 
                 {userRole !== "psicologo" && (
                     <Link to="/conta">
