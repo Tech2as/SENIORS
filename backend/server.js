@@ -326,20 +326,6 @@ app.post('/save-conta', (req, res) => {
     }
 });
 
-// cancelar consulta
-app.get("/get-delete", (req, res) => {
-    const id = req.query.id;
-    const sql = 'SELECT id FROM consultas WHERE id = ?';
-    
-    db.query(sql, [id], (err, results) => {
-        if (err) {
-            console.error('Erro na consulta SQL:', err);
-            return res.status(500).send(err);
-        }
-        res.json(results);
-    });
-});
-
 // Search para sinistros
 app.get('/search-sinistros', (req, res) => {
     
