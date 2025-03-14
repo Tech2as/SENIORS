@@ -2,12 +2,16 @@ import React from "react";
 import { Formik, Form, Field } from "formik";
 import Modal from "../template/Modal";
 
-const VerSinistrosDetalhes = ({ showAModal, handleCloseAModal, sinistro }) => {
+const VerSinistrosDetalhes = ({
+  showAModal,
+  handleCloseAModal,
+  sinistro
+}: any) => {
   // Verificação de segurança para evitar erros
   if (!sinistro) return null;
   
   // Formatação da data com tratamento de erro
-  const formatarData = (dataStr) => {
+  const formatarData = (dataStr: any) => {
     try {
       return new Date(dataStr).toLocaleDateString("pt-BR");
     } catch (error) {
@@ -18,7 +22,8 @@ const VerSinistrosDetalhes = ({ showAModal, handleCloseAModal, sinistro }) => {
   return (
     <Modal show={showAModal} onClose={handleCloseAModal}>
       <div className="modal-content2">
-        <Formik
+        <Formik 
+          onSubmit={() => {}} // Função vazia, já que o formulário é apenas para visualização
           initialValues={{
             idsinistro: sinistro.idsinistro || "",
             aviso: sinistro.aviso || "",

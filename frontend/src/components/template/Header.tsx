@@ -2,7 +2,7 @@ import './Header.css'
 import React, { useEffect, useState } from 'react';
 import Axios from 'axios';
 
-const MyComponent = (props) => {
+const MyComponent = (props: any) => {
     const [name, setName] = useState('');
     
     const token = localStorage.getItem('token');

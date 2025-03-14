@@ -1,17 +1,19 @@
-require('dotenv').config();  // Certifique-se de que está logo no início
+import * as dotenv from "dotenv";
+import express from "express";
+import mysql from "mysql";
+import cors from "cors";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
-const express = require("express");
-const mysql = require("mysql");
-const cors = require("cors");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+// Carregar variáveis de ambiente
+dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
 // Carregar variáveis de ambiente
-const SECRET_KEY = process.env.SECRET_KEY;
+const SECRET_KEY = process.env.SECRET_KEY as string;
 
 if (!SECRET_KEY) {
     console.error("Erro: SECRET_KEY não está definida!");
@@ -20,27 +22,28 @@ if (!SECRET_KEY) {
 
 
 // Configuração do banco de dados usando variáveis do .env
-const db = mysql.createPool({
+declare namespace NodeJS {
+    export interface ProcessEnv {
+      SECRET_KEY: string;
+      DB_HOST: string;
+      DB_USER: string;
+      DB_PASS: string;
+      DB_NAME: string;
+      PORT: string;
+    }
+  }
+
+  const db: mysql.Pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
-    database: process.env.DB_NAME
-});
-
-db.getConnection((err, connection) => {
-    if (err) {
-        console.error("Erro ao conectar ao banco de dados:", err);
-        return;
-    }
-    console.log("Conexão bem-sucedida ao MySQL!");
-    connection.release();
-});
-
+    database: process.env.DB_NAME,
+  });
 app.use(express.json());
 app.use(cors());
 
 // Rota de registro
-app.post('/registro', (req, res) => {
+app.post('/registro', (req: express.Request, res: express.Response) => {
     const { nome, funcao, email, senha } = req.body;
 
     // Verifica se todos os campos estão presentes
@@ -58,7 +61,7 @@ app.post('/registro', (req, res) => {
     db.query(
         'INSERT INTO usuarios (nome, funcao, email, senha) VALUES (?, ?, ?, ?)',
         [nome, funcao, email, hashedPassword],
-        (err, results) => {
+        (err: any, results: any) => {
             if (err) {
                 console.error("Erro no servidor durante o registro:", err);
 
@@ -84,14 +87,14 @@ app.post('/registro', (req, res) => {
     );
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', (req: any, res: any) => {
     const { email, senha } = req.body;
 
     if (!email || !senha) {
         return res.status(400).json({ message: "Email e senha são obrigatórios." });
     }
 
-    db.query('SELECT * FROM usuarios WHERE email = ?', [email], (err, results) => {
+    db.query('SELECT * FROM usuarios WHERE email = ?', [email], (err: any, results: any) => {
         if (err) {
             console.error("Erro no servidor:", err);
             return res.status(500).json({ message: 'Erro no servidor.' });
@@ -131,7 +134,7 @@ app.post('/login', (req, res) => {
 });
 
 // Salvar sinistro no BD
-app.post('/save-sinistro', (req, res) => {
+app.post('/save-sinistro', (req: any, res: any) => {
     const { apolice, aviso, chassi, aon, regulador, data, observacoes, status } = req.body;
 
     if (!apolice || !aviso || !chassi || !data) {
@@ -145,7 +148,7 @@ app.post('/save-sinistro', (req, res) => {
     db.query(
         'SELECT * FROM sinistros WHERE aviso = ? OR chassi = ?',
         [aviso, chassi],
-        (err, results) => {
+        (err: any, results: any) => {
             if (err) {
                 console.error("Erro no servidor:", err);
                 return res.status(500).send({
@@ -165,7 +168,7 @@ app.post('/save-sinistro', (req, res) => {
             db.query(
                 'INSERT INTO sinistros (apolice, aviso, chassi, aon, regulador, data, observacoes, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                 [apolice, aviso, chassi, aon, regulador, data, observacoes, status],
-                (err, results) => {
+                (err: any, results: any) => {
                     if (err) {
                         console.error("Erro ao registrar sinistro:", err);
                         return res.status(500).send({
@@ -185,7 +188,7 @@ app.post('/save-sinistro', (req, res) => {
 
 
 //edit sinistro
-app.post('/edit-sinistro', (req, res) => {
+app.post('/edit-sinistro', (req: any, res: any) => {
     const { id, apolice, aviso, chassi, aon, data, observacoes, status } = req.body;
 
     // Verificar se todos os dados obrigatórios foram enviados
@@ -200,7 +203,7 @@ app.post('/edit-sinistro', (req, res) => {
     db.query(
         'UPDATE sinistros SET apolice=?, aviso=?, chassi=?, aon=?, data=?, observacoes=?, estado=? WHERE id=?',
         [apolice, aviso, chassi, aon, data, observacoes, status, id],
-        (err, results) => {
+        (err: any, results: any) => {
             if (err) {
                 console.error("Erro no servidor durante a atualização:", err);
                 return res.status(500).send({
@@ -227,7 +230,7 @@ app.post('/edit-sinistro', (req, res) => {
 
     
 // search conta
-app.get('/search-conta', (req, res) => {
+app.get('/search-conta', (req: any, res: any) => {
     const { userId } = req.query;
 
     // Verifica se o userId foi passado
@@ -236,7 +239,7 @@ app.get('/search-conta', (req, res) => {
     }
 
     const sql = 'SELECT * FROM usuarios WHERE id = ?';
-    db.query(sql, [userId], (err, results) => {
+    db.query(sql, [userId], (err: any, results: any) => {
         if (err) {
             console.error('Erro na consulta SQL:', err);
             return res.status(500).send({ message: 'Erro ao buscar usuário', error: err });
@@ -254,7 +257,7 @@ app.get('/search-conta', (req, res) => {
     });
 });
 
-app.post('/save-conta', (req, res) => {
+app.post('/save-conta', (req: any, res: any) => {
     try {
         const { id, nome, email, senha } = req.body;
 
@@ -266,7 +269,7 @@ app.post('/save-conta', (req, res) => {
         }
 
         // Recupera a senha atual do banco de dados
-        db.query('SELECT senha FROM usuarios WHERE id = ?', [id], (err, rows) => {
+        db.query('SELECT senha FROM usuarios WHERE id = ?', [id], (err: any, rows: any) => {
             if (err) {
                 console.error("Erro ao buscar a senha:", err);
                 return res.status(500).send({
@@ -294,7 +297,7 @@ app.post('/save-conta', (req, res) => {
             db.query(
                 'UPDATE usuarios SET nome = ?, email = ?, senha = ? WHERE id = ?',
                 [nome, email, novaSenha, id],
-                (err, results) => {
+                (err: any, results: any) => {
                     if (err) {
                         console.error("Erro ao atualizar os dados:", err);
                         return res.status(500).send({
@@ -327,7 +330,7 @@ app.post('/save-conta', (req, res) => {
 });
 
 // Search para sinistros
-app.get('/search-sinistros', (req, res) => {
+app.get('/search-sinistros', (req: any, res: any) => {
     
     const { page = 1, limit = 5 } = req.query;
     
@@ -337,7 +340,7 @@ app.get('/search-sinistros', (req, res) => {
 
     const sql = 'SELECT * FROM sinistros ORDER BY id DESC LIMIT ? OFFSET ?';
     
-    db.query(sql, [pageLimit, offset], (err, results) => {
+    db.query(sql, [pageLimit, offset], (err: any, results: any) => {
         if (err) {
             console.error('Erro na consulta SQL:', err);
             return res.status(500).send({ message: 'Erro ao buscar sinistros', error: err });
@@ -351,11 +354,11 @@ app.get('/search-sinistros', (req, res) => {
 });
 
 //Ver sinistros pelo id
-app.get("/get-sinistro", (req, res) => {
+app.get("/get-sinistro", (req: any, res: any) => {
     const id = req.query.id;
  
     const sql = 'SELECT * FROM sinistros WHERE id = ?';
-    db.query(sql, [id], (err, results) => {
+    db.query(sql, [id], (err: any, results: any) => {
          if (err) {
              console.error('Erro na consulta SQL:', err); // Log para erro na consulta
              return res.status(500).send(err);
@@ -364,7 +367,7 @@ app.get("/get-sinistro", (req, res) => {
      });
  });
 
-app.get('/search-name-user', (req, res) => {
+app.get('/search-name-user', (req: any, res: any) => {
     const token = req.headers['x-access-token'];
 
     if (!token) {
@@ -372,13 +375,13 @@ app.get('/search-name-user', (req, res) => {
         return res.status(401).send({ auth: false, message: 'Token não fornecido.' });
     }
 
-    jwt.verify(token, SECRET_KEY, (err, decoded) => {
+    jwt.verify(token, SECRET_KEY, (err: any, decoded: any) => {
         if (err) {
             console.error('Erro na verificação do token:', err); // Verifique o erro de verificação do JWT
             return res.status(500).send({ auth: false, message: 'Falha na autenticação do token.' });
         }
 
-        db.query('SELECT * FROM usuarios WHERE id = ?', [decoded.id], (err, results) => {
+        db.query('SELECT * FROM usuarios WHERE id = ?', [decoded.id], (err: any, results: any) => {
             if (err) {
                 console.error('Erro ao executar a consulta no banco de dados:', err); // Verifique erros na consulta SQL
                 return res.status(500).send('Erro no servidor.');
@@ -393,11 +396,11 @@ app.get('/search-name-user', (req, res) => {
     });
 });
 
-app.get('/search-function-user', (req, res) => {
+app.get('/search-function-user', (req: any, res: any) => {
     const id = req.query.id;
     const sql = 'SELECT * FROM usuarios WHERE funcao = "psicologo "';
     
-    db.query(sql, [id], (err, results) => {
+    db.query(sql, [id], (err: any, results: any) => {
         if (err) {
             console.error('Erro na consulta SQL:', err); // Log para erro na consulta
             return res.status(500).send(err);
@@ -408,18 +411,18 @@ app.get('/search-function-user', (req, res) => {
 });
 
 // Rota protegida de exemplo
-app.get('/me', (req, res) => {
+app.get('/me', (req: any, res: any) => {
     const token = req.headers['x-access-token'];
     if (!token) {
         return res.status(401).send({ auth: false, message: 'Token não fornecido.' });
     }
 
-    jwt.verify(token, SECRET_KEY, (err, decoded) => {
+    jwt.verify(token, SECRET_KEY, (err: any, decoded: any) => {
         if (err) {
             return res.status(500).send({ auth: false, message: 'Falha na autenticação do token.' });
         }
 
-        db.query('SELECT * FROM usuario WHERE id = ?', [decoded.id], (err, results) => {
+        db.query('SELECT * FROM usuario WHERE id = ?', [decoded.id], (err: any, results: any) => {
             if (err) {
                 return res.status(500).send('Erro no servidor.');
             }
@@ -432,7 +435,7 @@ app.get('/me', (req, res) => {
     });
 });
 
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });

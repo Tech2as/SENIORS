@@ -2,12 +2,18 @@ import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import Modal from "../template/Modal";
 
-const EditarSinistros = ({ showEModal, handleCloseEModal, sinistro, handleSave, validationSchema }) => {
+const EditarSinistros = ({
+  showEModal,
+  handleCloseEModal,
+  sinistro,
+  handleSave,
+  validationSchema
+}: any) => {
   // Verificação de segurança para evitar erros
   if (!sinistro) return null;
 
   // Formatação da data com tratamento de erro
-  const formatarData = (dataStr) => {
+  const formatarData = (dataStr: any) => {
     try {
       return new Date(dataStr).toISOString().split('T')[0];
     } catch (error) {

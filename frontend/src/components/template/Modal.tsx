@@ -1,7 +1,11 @@
 import React from 'react'
 import './Modal.css'
 
-const Modal = ({ show, onClose, children }) => {
+const Modal = ({
+  show,
+  onClose,
+  children
+}: any) => {
     if (!show) {
       return null;
     }

@@ -2,7 +2,10 @@ import React from "react";
 import './Nav.css';
 import { Link } from "react-router-dom";
 
-const Nav = ({onLogout, userRole }) => {
+const Nav = ({
+    onLogout,
+    userRole
+}: any) => {
     return (
         <aside className="menu-area">
             <nav className="menu">

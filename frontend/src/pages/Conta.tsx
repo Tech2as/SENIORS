@@ -23,7 +23,9 @@ const Conta = () => {
         if (token) {
             try {
                 const decodedToken = jwtDecode(token); // Decodifica o token
+                // @ts-expect-error TS(2339): Property 'id' does not exist on type 'JwtPayload'.
                 if (decodedToken.id) {
+                    // @ts-expect-error TS(2339): Property 'id' does not exist on type 'JwtPayload'.
                     setUserId(decodedToken.id); // Define o userId
                     setLoading(false);  // Dados carregados com sucesso
                 } else {
@@ -75,7 +77,7 @@ const Conta = () => {
     };
 
 //Salvar os dados
-    const handleSubmit = (values) => {
+    const handleSubmit = (values: any) => {
         Axios.post("http://localhost:3002/save-conta", {
           id: values.id,
           nome: values.nome,
@@ -93,7 +95,7 @@ const Conta = () => {
 
 // Excluir conta
 
-const handleDeleteAccount = (id, navigate) => {
+const handleDeleteAccount = (id: any, navigate: any) => {
     if (window.confirm("Tem certeza de que deseja excluir sua conta? Esta ação é irreversível!")) {
         Axios.delete("http://localhost:3002/delete-conta", { data: { id } })
             .then(() => {
