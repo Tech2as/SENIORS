@@ -11,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import VerSinistrosDetalhes from "../components/modals/VerDetalhesSinistro";
 import EditarSinistros from '../components/modals/EditarSinistros';
+import NovoSinistro from '../components/modals/NovoSinistro';
 
 // Interfaces para tipagem
 interface SinistroData {
@@ -281,7 +282,8 @@ const Sinistros = () => {
             observacoes: values.observacoes
         }).then(() => {
             toast.success("Sinistro editado!");
-            window.location.reload(); // Força o recarregamento da página
+            handleCloseEModal();
+            fetchSinistros(); // Atualiza a lista após salvar
         }).catch((error) => {
             if (error.response) {
                 toast.error("Erro ao editar o sinistro. Tente novamente.");
@@ -465,95 +467,13 @@ const Sinistros = () => {
       />
 
       {/* Modal do Novo Sinistro */}
-      <Modal show={showModal} onClose={handleCloseModal}>
-        <div className="modal-content2">
-          <Formik 
-            initialValues={{   regulador: userName || '', // Use empty string as fallback
-              apolice: '',
-              aviso: '',
-              chassi: '',
-              aon: '',
-              data: '',
-              status: '',
-              observacoes: '' }} 
-            onSubmit={handleSubmit}
-            validationSchema={validationSchema}
-          >
-            <Form action="">
-              <h2>Novo Sinistro</h2>
-              <div className="modal-inside">
-                <div className="form-group1">
-                  <label>Apólice:</label>
-                  <Field as="select" name="apolice">
-                    <option value="">Selecione uma apólice</option>
-                    <option value="PSA">PSA</option>
-                    <option value="IVECO">IVECO</option>
-                    <option value="CNH">CNH</option>
-                  </Field>
-                  <ErrorMessage component="span" className="text-danger" name="apolice" />
-                </div>
-
-                <div className="form-group1">
-                  <label>Status do processo:</label>
-                  <Field as="select" name="status">
-                    <option value="">Selecione</option>
-                    <option value="aberto">Processo aberto</option>
-                    <option value="pendente">Documentos faltantes</option>
-                    <option value="encerrado">Processo encerrado</option>
-                  </Field>
-                  <ErrorMessage component="span" className="text-danger" name="status" />
-                </div>
-
-                <div className="form-group1">
-                  <label>Número de aviso:</label>
-                  <Field name="aviso" type="number" />
-                  <ErrorMessage component="span" className="text-danger" name="aviso" />
-                </div>
-
-                <div className="form-group1">
-                  <label>Chassi:</label>
-                  <Field name="chassi" type="text" />
-                  <ErrorMessage component="span" className="text-danger" name="chassi" />
-                </div>
-
-                <div className="form-group1">
-                  <label>AON:</label>
-                  <Field name="aon" type="text" />
-                  <ErrorMessage component="span" className="text-danger" name="aon" />
-                </div>
-
-                <div className="form-group1">
-                  <label>Data:</label>
-                  <Field name="data" type="date" />
-                  <ErrorMessage component="span" className="text-danger" name="data" />
-                </div>
-
-                <div className="form-group1">
-                  <label>Regulador:</label>
-                  <Field name="regulador" type="text" value={userName} disabled />
-                  <ErrorMessage component="span" className="text-danger" name="regulador" />
-                </div>
-
-                <div className="form-group1">
-                  <label htmlFor="observacoes">Observações:</label>
-                  <Field
-                    as="textarea"
-                    id="observacoes"
-                    name="observacoes"
-                    className="form-control"
-                  />
-                  <ErrorMessage component="span" className="text-danger" name="observacoes" />
-                </div>
-
-                <Field name="userid" hidden />
-                <Field name="username" hidden />
-
-                <button type="submit" className="btn btn-success">Salvar</button>
-              </div>
-            </Form>
-          </Formik>
-        </div>
-      </Modal>
+     <NovoSinistro
+      showModal={showModal}
+      handleCloseModal={handleCloseModal}
+      sinistro={sinistroSelecionado}
+      handleSubmit={handleSubmit}
+      validationSchema={validationSchema}
+     />
 
       {/* Modal do Editar sinistro */}
       <EditarSinistros
