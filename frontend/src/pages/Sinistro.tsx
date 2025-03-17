@@ -293,40 +293,6 @@ const Sinistros = () => {
         })
     };
 
-    // Filtro
-    const [filtroTipo, setFiltroTipo] = useState("apolice"); // Pode ser "apolice", "status" ou "texto"
-    const [filtroValor, setFiltroValor] = useState(""); // Valor do filtro selecionado
-    const [sinistrosFiltrados, setSinistrosFiltrados] = useState<SinistroData[]>([]);
-
-    const apolices = ["PSA", "IVECO", "CNH"];
-    const statusList = ["Aberto", "Pendente", "Encerrado"];
-
-    useEffect(() => {
-        if (!filtroValor) {
-            setSinistrosFiltrados(sinistros);
-            return;
-        }
-
-        const filtrados = sinistros.filter((sinistro) => {
-            if (filtroTipo === "apolice") {
-                return sinistro.apolice.trim().toUpperCase() === filtroValor.toUpperCase();
-            }
-            if (filtroTipo === "status") {
-                return sinistro.estado?.trim().toLowerCase() === filtroValor.toLowerCase();
-            }
-            if (filtroTipo === "texto") {
-                return (
-                    sinistro.aviso.includes(filtroValor) ||
-                    sinistro.chassi.includes(filtroValor) ||
-                    sinistro.aon.includes(filtroValor)
-                );
-            }
-            return true;
-        });
-
-        setSinistrosFiltrados(filtrados);
-    }, [sinistros, filtroTipo, filtroValor]);
-
     return (
         <Main icon="car" title="Sinistros">
             <div className="p-3">
@@ -341,37 +307,23 @@ const Sinistros = () => {
                 <div className="d-flex mb-3">
                     <select
                         className="form-control me-2"
-                        value={filtroTipo}
-                        onChange={(e) => {
-                            setFiltroTipo(e.target.value);
-                            setFiltroValor("");
-                        }}
                     >
                         <option value="apolice">Apólice</option>
                         <option value="status">Status</option>
                         <option value="texto">Número de Aviso, Chassi ou AON</option>
                     </select>
 
-                    {filtroTipo === "texto" ? (
                         <input
                             type="text"
                             className="form-control"
                             placeholder="Digite para buscar"
-                            value={filtroValor}
-                            onChange={(e) => setFiltroValor(e.target.value)}
                         />
-                    ) : (
                         <select
                             className="form-control"
-                            value={filtroValor}
-                            onChange={(e) => setFiltroValor(e.target.value)}
                         >
                             <option value="">Todos</option>
-                            {filtroTipo === "apolice"
-                                ? apolices.map((ap) => <option key={ap} value={ap}>{ap}</option>)
-                                : statusList.map((st) => <option key={st} value={st.toLowerCase()}>{st}</option>)}
                         </select>
-                    )}
+
                 </div>
                 <table className="table table-bordered mt-4">
                     <thead>
@@ -387,58 +339,61 @@ const Sinistros = () => {
         </tr>
       </thead>
       <tbody>
-      {sinistrosFiltrados.length > 0 ? (
-              sinistrosFiltrados.map((sinistro, index) => {
-                const estado = sinistro.estado ? estadoMap[sinistro.estado.toLowerCase()] || {
-                  label: sinistro.estado,
-                  color: "transparent",
-                } : { label: "Indefinido", color: "gray" };
-                return (
-                  <tr key={index}>
-                    <td>{sinistro.aviso}</td>
-                    <td>{sinistro.chassi}</td>
-                    <td>{sinistro.apolice}</td>
-                    <td>{sinistro.aon}</td>
-                    <td>{sinistro.regulador}</td>
-                    <td>{new Date(sinistro.data).toLocaleDateString("pt-BR")}</td>
-                    <td>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "5px 10px",
-                          borderRadius: "5px",
-                          backgroundColor: estado.color,
-                          color: "white",
-                        }}
-                      >
-                        {estado.label}
-                      </span>
-                    </td>
-                    <td className="td-actions">
-                      <button
+      {sinistros.length > 0 ? (
+  sinistros.map((sinistro, index) => { 
+    const estado = sinistro.estado 
+      ? estadoMap[sinistro.estado.toLowerCase()] || { label: sinistro.estado, color: "transparent" }
+      : { label: "Indefinido", color: "gray" };
+
+    return (
+      <tr key={index}>
+        <td>{sinistro.aviso}</td>
+        <td>{sinistro.chassi}</td>
+        <td>{sinistro.apolice}</td>
+        <td>{sinistro.aon}</td>
+        <td>{sinistro.regulador}</td>
+        <td>{new Date(sinistro.data).toLocaleDateString("pt-BR")}</td>
+        <td>
+          <span
+            style={{
+              display: "inline-block",
+              padding: "5px 10px",
+              borderRadius: "5px",
+              backgroundColor: estado.color,
+              color: "white",
+            }}
+          >
+            {estado.label}
+          </span>
+        </td>
+        <td className="td-actions">
+        <button
                         className="btn btn-primary"
                         value={sinistro.id}
                         onClick={handleClick}
                       >
                         <i className="fa fa-eye"></i>
                       </button>
-                      <button
+
+          <button
                         className="btn btn-warning"
                         value={sinistro.id}
                         onClick={handleClickEdit}
                       >
                         <i className="fa fa-pencil-square-o"></i>
                       </button>
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan={8} className="text-center">Nenhum sinistro encontrado</td>
-              </tr>
-            )}
-          </tbody>
+        </td>
+      </tr>
+    );
+  })
+) : (
+  <tr>
+    <td colSpan={8} className="text-center">Nenhum sinistro encontrado</td>
+  </tr>
+)}
+
+</tbody>
+
         </table>
         <div className="d-flex justify-content-between">
           <button
