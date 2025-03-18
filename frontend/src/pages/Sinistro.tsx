@@ -293,6 +293,12 @@ const Sinistros = () => {
         })
     };
 
+    //filtro
+    const [filtro, setFiltro] = useState("texto");
+    
+    const apoliceMap = ["Todos", "PSA", "IVECO", "CNH"];
+    const statsMap = ["Todos", "Abertos", "Pendentes", "Encerrados"];
+
     return (
         <Main icon="car" title="Sinistros">
             <div className="p-3">
@@ -307,23 +313,30 @@ const Sinistros = () => {
                 <div className="d-flex mb-3">
                     <select
                         className="form-control me-2"
+                        value={filtro}
+                        onChange={(e) => setFiltro(e.target.value)}
                     >
                         <option value="apolice">Apólice</option>
                         <option value="status">Status</option>
                         <option value="texto">Número de Aviso, Chassi ou AON</option>
                     </select>
 
+                    {filtro === "texto" && (
                         <input
                             type="text"
                             className="form-control"
                             placeholder="Digite para buscar"
                         />
-                        <select
-                            className="form-control"
-                        >
-                            <option value="">Todos</option>
+                    )}
+                    
+                    {(filtro === "apolice" || filtro === "status") && (
+                        <select className="form-control">
+                            {filtro === "apolice" 
+                                ? apoliceMap.map((item) => <option key={item} value={item}>{item}</option>)
+                                : statsMap.map((item) => <option key={item} value={item}>{item}</option>)
+                            }
                         </select>
-
+                    )}
                 </div>
                 <table className="table table-bordered mt-4">
                     <thead>
