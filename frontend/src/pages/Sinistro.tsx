@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import Main from '../components/template/Main';
-import Modal from "../components/template/Modal"
-import { Formik, Form, Field, ErrorMessage } from "formik"
 import { useNavigate } from 'react-router-dom'
 import * as yup from "yup";
 import Axios from "axios"
@@ -134,6 +132,7 @@ const Sinistros = () => {
             console.error('userId não disponível');
             return; // Se o userId não estiver definido, não faça a requisição
         }
+
         try {
             // Use uma variável de ambiente
             const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
@@ -294,50 +293,93 @@ const Sinistros = () => {
     };
 
     //filtro
-    const [filtro, setFiltro] = useState("texto");
+    interface Opcoes {
+        apolice: string[];
+        estado: string[];
+      }
+      
+      const [opcoes, setOpcoes] = useState<Opcoes>({
+        apolice: ["Todos", "PSA", "IVECO", "CNH"],
+        estado: ["Todos", "Pendente", "Aberto", "Encerrado"], 
+      });
+
+  const handleSearchFilter = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const tipo = filtroTipo
+    const status = filtroValor
+    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+    Axios.get(`${apiUrl}/filter-sinistro?tipo=${tipo}&status=${status}`)
+    .then((response) => {
+      setSinistros(response.data.data);
+      setTotal(response.data.total); 
+    })
+    .catch((error) => {
+        console.error('Erro ao fazer a solicitação GET:', error);
+    });
     
-    const apoliceMap = ["Todos", "PSA", "IVECO", "CNH"];
-    const statsMap = ["Todos", "Abertos", "Pendentes", "Encerrados"];
+  }
 
-    return (
-        <Main icon="car" title="Sinistros">
-            <div className="p-3">
-                <ToastContainer /> 
-                <div className="d-flex justify-content-between pb-3">
-                    <button className="btn btn-success" onClick={handleOpenModal}>
-                        <i className="fa fa-plus-square px-2"></i>
-                        Novo Sinistro
-                    </button>
-                </div>
+  const [filtroTipo, setFiltroTipo] = useState("texto");
+  const [filtroValor, setFiltroValor] = useState("");
+  const [buscarnome, setBuscarNome] = useState('');
 
-                <div className="d-flex mb-3">
-                    <select
-                        className="form-control me-2"
-                        value={filtro}
-                        onChange={(e) => setFiltro(e.target.value)}
-                    >
-                        <option value="apolice">Apólice</option>
-                        <option value="status">Status</option>
-                        <option value="texto">Número de Aviso, Chassi ou AON</option>
-                    </select>
-
-                    {filtro === "texto" && (
-                        <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Digite para buscar"
-                        />
-                    )}
-                    
-                    {(filtro === "apolice" || filtro === "status") && (
-                        <select className="form-control">
-                            {filtro === "apolice" 
-                                ? apoliceMap.map((item) => <option key={item} value={item}>{item}</option>)
-                                : statsMap.map((item) => <option key={item} value={item}>{item}</option>)
-                            }
-                        </select>
-                    )}
-                </div>
+  return (
+    <Main icon="car" title="Sinistros">
+      <div className="p-3">
+        <ToastContainer />
+        
+        <div className="d-flex justify-content-between pb-3">
+          <button className="btn btn-success" onClick={handleOpenModal}>
+            <i className="fa fa-plus-square px-2"></i>
+              Novo Sinistro
+          </button>
+        </div>
+        
+        {/* Filtros */}
+        <div className="d-flex mb-3">
+          <select
+            className="form-control me-2"
+            value={filtroTipo}
+            onChange={(e) => {
+              setFiltroTipo(e.target.value);
+              setFiltroValor(""); 
+            }}
+          >
+            <option value="apolice">Apólice</option>
+            <option value="estado">Status</option>
+            <option value="texto">Número de Aviso, Chassi ou AON</option>
+          </select>
+          
+          {filtroTipo === "texto" ? (
+  <input
+    type="text"
+    className="form-control me-2"
+    placeholder="Digite para buscar"
+    name={buscarnome}
+    value={filtroValor}
+    onChange={(e) => setFiltroValor(e.target.value)}
+  />
+) : (
+  <select
+    className="form-control me-2"
+    value={filtroValor}
+    onChange={(e) => setFiltroValor(e.target.value)}
+  >
+    <option value="">Selecione...</option>
+    {opcoes[filtroTipo as keyof Opcoes]?.map(item => (
+      <option key={item} value={item}>{item}</option>
+    ))}
+  </select>
+)}
+          
+          <button 
+            onClick={handleSearchFilter}
+            className="btn btn-primary px-2"
+            disabled={loading}
+          >
+            {loading ? "Carregando..." : <i className="fa fa-search"></i>}
+            
+          </button>
+        </div>
                 <table className="table table-bordered mt-4">
                     <thead>
         <tr>

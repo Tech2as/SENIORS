@@ -227,8 +227,7 @@ app.post('/edit-sinistro', (req: any, res: any) => {
         }
     );
 });
-
-    
+  
 // search conta
 app.get('/search-conta', (req: any, res: any) => {
     const { userId } = req.query;
@@ -253,6 +252,50 @@ app.get('/search-conta', (req: any, res: any) => {
         // Retorna o primeiro resultado, assumindo que há um único usuário para o userId
         res.json({
             data: results[0], // Envia o primeiro usuário encontrado
+        });
+    });
+});
+
+//sinistro
+app.get('/filter-sinistro', (req: any, res: any) => {
+    const { tipo, status, page = 1, limit = 5 } = req.query;
+    
+    const pageNumber = parseInt(page);
+    const pageLimit = parseInt(limit);
+    const offset = (pageNumber - 1) * pageLimit;
+
+    let sql = '';
+    const queryParams: any[] = [];
+    if (status === 'Todos' || status === '') {
+        sql = 'SELECT * FROM sinistros ORDER BY id DESC LIMIT ? OFFSET ?';
+        queryParams.push(pageLimit, offset);
+
+    } else if (tipo === 'apolice') {
+        sql = 'SELECT * FROM sinistros ' +
+              'WHERE apolice = ? OR estado = ? ' + 
+              'ORDER BY id DESC LIMIT ? OFFSET ?';
+        queryParams.push(status, status, pageLimit, offset);
+
+    } else if (tipo === 'estado') {
+        sql = 'SELECT * FROM sinistros ' + 
+              'WHERE estado = ? ' + 
+              'ORDER BY id DESC LIMIT ? OFFSET ?';
+        queryParams.push(status, pageLimit, offset);
+
+    } else if (tipo === 'texto') {
+        sql = "SELECT * FROM sinistros WHERE aviso LIKE ? OR chassi LIKE ? OR AON LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?";
+        queryParams.push(`%${status}%`, `%${status}%`, `%${status}%`, pageLimit, offset);
+    }
+
+    db.query(sql, queryParams, (err: any, results: any) => {
+        if (err) {
+            console.error('Erro na consulta SQL:', err);
+            return res.status(500).send({ message: 'Erro ao buscar sinistros', error: err });
+        }
+        
+        res.json({
+            data: results,
+            total: results.length
         });
     });
 });
