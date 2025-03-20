@@ -265,40 +265,63 @@ app.get('/filter-sinistro', (req: any, res: any) => {
     const offset = (pageNumber - 1) * pageLimit;
 
     let sql = '';
+    let countSql = '';
     const queryParams: any[] = [];
+    const countParams: any[] = [];
+
     if (status === 'Todos' || status === '') {
         sql = 'SELECT * FROM sinistros ORDER BY id DESC LIMIT ? OFFSET ?';
+        countSql = 'SELECT COUNT(*) AS total FROM sinistros';
         queryParams.push(pageLimit, offset);
 
     } else if (tipo === 'apolice') {
         sql = 'SELECT * FROM sinistros ' +
               'WHERE apolice = ? OR estado = ? ' + 
               'ORDER BY id DESC LIMIT ? OFFSET ?';
+        countSql = 'SELECT COUNT(*) AS total FROM sinistros WHERE apolice = ? OR estado = ?';
         queryParams.push(status, status, pageLimit, offset);
+        countParams.push(status, status);
 
     } else if (tipo === 'estado') {
         sql = 'SELECT * FROM sinistros ' + 
               'WHERE estado = ? ' + 
               'ORDER BY id DESC LIMIT ? OFFSET ?';
+        countSql = 'SELECT COUNT(*) AS total FROM sinistros WHERE estado = ?';
         queryParams.push(status, pageLimit, offset);
+        countParams.push(status);
 
     } else if (tipo === 'texto') {
         sql = "SELECT * FROM sinistros WHERE aviso LIKE ? OR chassi LIKE ? OR AON LIKE ? ORDER BY id DESC LIMIT ? OFFSET ?";
+        countSql = "SELECT COUNT(*) AS total FROM sinistros WHERE aviso LIKE ? OR chassi LIKE ? OR AON LIKE ?";
         queryParams.push(`%${status}%`, `%${status}%`, `%${status}%`, pageLimit, offset);
+        countParams.push(`%${status}%`, `%${status}%`, `%${status}%`);
     }
 
-    db.query(sql, queryParams, (err: any, results: any) => {
+    db.query(countSql, countParams, (err: any, countResults: any) => {
         if (err) {
-            console.error('Erro na consulta SQL:', err);
-            return res.status(500).send({ message: 'Erro ao buscar sinistros', error: err });
+            console.error('Erro ao contar registros:', err);
+            return res.status(500).send({ message: 'Erro ao contar sinistros', error: err });
         }
-        
-        res.json({
-            data: results,
-            total: results.length
+
+        const totalRegistros = countResults[0].total;
+        const totalPages = Math.ceil(totalRegistros / pageLimit);
+
+        db.query(sql, queryParams, (err: any, results: any) => {
+            if (err) {
+                console.error('Erro na consulta SQL:', err);
+                return res.status(500).send({ message: 'Erro ao buscar sinistros', error: err });
+            }
+            
+            res.json({
+                data: results,
+                total: totalRegistros,
+                totalPages: totalPages,
+                currentPage: pageNumber
+            });
         });
     });
 });
+
 
 app.post('/save-conta', (req: any, res: any) => {
     try {

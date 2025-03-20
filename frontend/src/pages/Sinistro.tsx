@@ -66,6 +66,8 @@ const Sinistros = () => {
     const [userId, setUserId] = useState<string | null>(null);
     const [userName, setUserName] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     // Const para verificação de detalhes de cada sinistro
     const [idsinistro, setIdSinistro] = useState('');
@@ -116,35 +118,39 @@ const Sinistros = () => {
     }, [navigate]);
 
     useEffect(() => {
-        if (!loading) {
-            fetchSinistros();
-        }
-    }, [page, loading, userId]);
+      fetchSinistros();
+  }, [page, userId]);
 
-    const fetchSinistros = async () => {
-        const token = localStorage.getItem('token'); 
-        if (!token) {
-            console.error('Token não disponível');
-            return;
-        }
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+        setCurrentPage(currentPage + 1);
+    }
+};
 
-        if (!userId) {
-            console.error('userId não disponível');
-            return; // Se o userId não estiver definido, não faça a requisição
-        }
+const prevPage = () => {
+    if (currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+    }
+};
 
-        try {
-            // Use uma variável de ambiente
-            const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
-            const response = await Axios.get(`${apiUrl}/search-sinistros`, {
-                params: { page, limit }  
-            });
-            setSinistros(response.data.data);
-            setTotal(response.data.total); // Atualiza o total de registros retornados
-        } catch (error) {
-            console.error("Erro ao buscar sinistros:", error);
-        }
-    };
+  const fetchSinistros = async () => {
+    if (loading) return; // Evita múltiplas chamadas simultâneas
+
+    setLoading(true); // Indica que a busca começou
+
+    try {
+        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+        const response = await Axios.get(`${apiUrl}/filter-sinistro?tipo=${filtroTipo}&status=${filtroValor}&page=${page}&limit=5`);
+        
+        setSinistros(response.data.data);
+        setTotalPages(response.data.totalPages);
+    } catch (error) {
+        console.error("Erro ao buscar sinistros:", error);
+    } finally {
+        setLoading(false); // Finaliza o carregamento
+    }
+};
+
 
     // Salvar os dados do novo sinistro
     const handleSubmit = (values: SinistroData, {
@@ -303,20 +309,6 @@ const Sinistros = () => {
         estado: ["Todos", "Pendente", "Aberto", "Encerrado"], 
       });
 
-  const handleSearchFilter = (event: React.MouseEvent<HTMLButtonElement>) => {
-    const tipo = filtroTipo
-    const status = filtroValor
-    const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3000';
-    Axios.get(`${apiUrl}/filter-sinistro?tipo=${tipo}&status=${status}`)
-    .then((response) => {
-      setSinistros(response.data.data);
-      setTotal(response.data.total); 
-    })
-    .catch((error) => {
-        console.error('Erro ao fazer a solicitação GET:', error);
-    });
-    
-  }
 
   const [filtroTipo, setFiltroTipo] = useState("texto");
   const [filtroValor, setFiltroValor] = useState("");
@@ -372,7 +364,7 @@ const Sinistros = () => {
 )}
           
           <button 
-            onClick={handleSearchFilter}
+            onClick={fetchSinistros}
             className="btn btn-primary px-2"
             disabled={loading}
           >
@@ -451,21 +443,23 @@ const Sinistros = () => {
 
         </table>
         <div className="d-flex justify-content-between">
-          <button
-            className="btn btn-danger"
-            disabled={page === 1}
-            onClick={() => setPage(page - 1)}
-          >
-            Anterior
-          </button>
-          <span>Página {page}</span>
-          <button
-            className="btn btn-primary"
-            disabled={total < limit}
-            onClick={() => setPage(page + 1)}
-          >
-            Próximo
-          </button>
+        <button
+    className="btn btn-danger"
+    disabled={page === 1}
+    onClick={() => setPage(page - 1)}
+  >
+    Anterior
+  </button>
+  
+  <span>Página {page} de {totalPages}</span>
+
+  <button
+    className="btn btn-primary"
+    disabled={page >= totalPages} // Correção aqui!
+    onClick={() => setPage(page + 1)}
+  >
+    Próximo
+  </button>
         </div>
       </div>
 
