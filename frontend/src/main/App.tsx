@@ -12,6 +12,7 @@ import Login from "../auth/Login";
 import Cadastro from "../auth/Cadastro";
 import PrivateRoute from "../auth/Private";
 import Conta from "../pages/Conta";
+import Cobrancas from '../pages/Cobrancas';
 
 // Definindo interfaces para melhorar a tipagem
 interface UserData {
@@ -79,6 +80,7 @@ const App = () => {
             <Route path="/" element={<Navigate to="/home" />} />
             <Route path="/sinistros" element={<PrivateRoute element={Sinistros} />} />
             <Route path="/conta" element={<PrivateRoute element={Conta} />} />
+            <Route path="cobrancas" element={<PrivateRoute element={Cobrancas}/>}/>
             <Route path="*" element={<Navigate to="/home" />} />
           </>
         )}

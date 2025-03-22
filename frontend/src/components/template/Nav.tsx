@@ -32,7 +32,9 @@ const handleSinistrosClick = () => {
                </button>
                {sinistrosAberto && (
                    <div className="submenu">
-                       <Link to="/sinistros/novo">Novo Sinistro</Link>
+                       <Link to="/cobrancas">
+                       <i className="fa fa-calendar" aria-hidden="true"></i>Cobranças
+                       </Link>
                        <Link to="/sinistros/pendentes">Pendentes</Link>
                        <Link to="/sinistros/finalizados">Finalizados</Link>
                    </div>
