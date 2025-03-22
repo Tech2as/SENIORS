@@ -1,11 +1,19 @@
-import React from "react";
+import { useState } from "react";
 import './Nav.css';
-import { Link } from "react-router-dom";
+import { Link, useNavigate  } from "react-router-dom";
 
 const Nav = ({
     onLogout,
     userRole
 }: any) => {
+
+const [sinistrosAberto, setSinistrosAberto] = useState(false);
+const navigate = useNavigate();
+
+const handleSinistrosClick = () => {
+    navigate("/sinistros"); // Redireciona para /sinistros
+    setSinistrosAberto(!sinistrosAberto); // Alterna o submenu
+};
     return (
         <aside className="menu-area">
             <nav className="menu">
@@ -15,10 +23,22 @@ const Nav = ({
 
                 {/* Renderiza o link "Atendimento" apenas se o userRole não for "psicologo" */}
                 {userRole !== "psicologo" && (
-                    <Link to="/sinistros">
-                        <i className="fa fa-car"></i> Sinistros
-                    </Link>
-                )}
+               <div className="menu-item">
+               <button
+                   className="menu-link sinistros-button"
+                   onClick={handleSinistrosClick}
+               >
+                   <i className="fa fa-car"></i> Sinistros
+               </button>
+               {sinistrosAberto && (
+                   <div className="submenu">
+                       <Link to="/sinistros/novo">Novo Sinistro</Link>
+                       <Link to="/sinistros/pendentes">Pendentes</Link>
+                       <Link to="/sinistros/finalizados">Finalizados</Link>
+                   </div>
+               )}
+           </div>
+       )}
 
                 {userRole !== "psicologo" && (
                     <Link to="/conta">

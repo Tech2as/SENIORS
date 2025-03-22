@@ -15,7 +15,7 @@ aside.menu-area {
     background: linear-gradient(135deg, #07a7e3 0%, #32dac3 100%) ;
 }
 
-.menu button {
+.menu button.deslogar {
     text-decoration: none;
     background-color: red;
     color: #FFF;
@@ -23,11 +23,36 @@ aside.menu-area {
     margin-top: 2%;
 }
 
-.menu button:hover {
-    color: #FFF;
-    background: linear-gradient(135deg, #CD1414 0%, #920404 100%) ;
+.menu button.deslogar:hover {
+    background: linear-gradient(135deg, #CD1414 0%, #920404 100%);
 }
 
+.menu-item {
+    position: relative;
+}
+
+.menu-link, .sinistros-button {
+    display: block;
+    text-decoration: none;
+    color: #FFF;
+    font-weight: 300;
+    padding: 15px;
+    width: 100%;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+}
+
+.menu-link:hover, .sinistros-button:hover {
+    background: linear-gradient(135deg, #07a7e3 0%, #32dac3 100%);
+}
+
+.menu-item {
+    position: relative; /* Mantém o submenu dentro do contexto do menu */
+}
 @media(max-width: 768px) {
 
     .menu {
@@ -56,3 +81,4 @@ aside.menu-area {
         margin-bottom: 2%;
     }
 }
+

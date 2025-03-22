@@ -395,29 +395,6 @@ app.post('/save-conta', (req: any, res: any) => {
     }
 });
 
-// Search para sinistros
-app.get('/search-sinistros', (req: any, res: any) => {
-    
-    const { page = 1, limit = 5 } = req.query;
-    
-    const pageNumber = parseInt(page);
-    const pageLimit = parseInt(limit);
-    const offset = (pageNumber - 1) * pageLimit;
-
-    const sql = 'SELECT * FROM sinistros ORDER BY id DESC LIMIT ? OFFSET ?';
-    
-    db.query(sql, [pageLimit, offset], (err: any, results: any) => {
-        if (err) {
-            console.error('Erro na consulta SQL:', err);
-            return res.status(500).send({ message: 'Erro ao buscar sinistros', error: err });
-        }
-        
-        res.json({
-            data: results,
-            total: results.length // Retorna a quantidade de registros retornados na resposta
-        });
-    });
-});
 
 //Ver sinistros pelo id
 app.get("/get-sinistro", (req: any, res: any) => {
