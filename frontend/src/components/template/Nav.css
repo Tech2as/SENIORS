@@ -51,7 +51,11 @@ aside.menu-area {
 }
 
 .menu-item {
-    position: relative; /* Mantém o submenu dentro do contexto do menu */
+    position: relative; 
+}
+
+.menu-item .submenu {
+    font-size: 13px;
 }
 @media(max-width: 768px) {
 
