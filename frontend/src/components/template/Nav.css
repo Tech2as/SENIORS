@@ -51,12 +51,38 @@ aside.menu-area {
 }
 
 .menu-item {
-    position: relative; 
+    position: relative;
+    width: 100%;
 }
-
 .menu-item .submenu {
     font-size: 13px;
 }
+
+.submenu{
+    top: 100%;
+    left: 0;
+    min-width: 100%;
+    padding-left: 15px;
+}
+
+.submenu i {
+    padding-right: 5px;
+}
+
+.submenu-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #ccc; 
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .menu .submenu-link:hover {
+    color: #111 !important; /* mais escuro no hover */
+    background: none !important; /* caso o .menu a:hover tenha bg */
+  }
+
 @media(max-width: 768px) {
 
     .menu {

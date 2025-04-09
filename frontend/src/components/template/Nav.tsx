@@ -27,16 +27,18 @@ const handleSinistrosClick = () => {
                    className="menu-link sinistros-button"
                    onClick={handleSinistrosClick}
                >
-                   <i className="fa fa-car"></i> Sinistros
+                  <i className="fa fa-paperclip" aria-hidden="true"></i> Sinistros
                </button>
                {sinistrosAberto && (
                    <div className="submenu">
-                       <Link to="/cobrancas">
-                       <i className="fa fa-calendar" aria-hidden="true"></i>Cobranças
-                       </Link>
-                       <Link to="/sinistros">Sinistros</Link>
-                       <Link to="/sinistros/finalizados">Finalizados</Link>
-                   </div>
+                   <Link to="/sinistros" className="submenu-link">
+                     <i className="fa fa-car" aria-hidden="true"></i>Sinistros
+                   </Link>
+                 
+                   <Link to="/cobrancas" className="submenu-link">
+                     <i className="fa fa-calendar" aria-hidden="true"></i>Cobranças
+                   </Link>
+                 </div>
                )}
            </div>
        )}
